@@ -15,8 +15,8 @@ function myFunction() {
     var url = 'https://peatix.com/search?q='+word+'&country=JP&l.text='+area+'&p='+i+'&size=10&v=3.4&dr=';
     var response = UrlFetchApp.fetch(url);
     var html = response.getContentText('UTF-8');
-    sheetData.getRange(1, 1).setValue(html);  
-    break;
+    sheetData.getRange(1, 1).setValue(html);  //HTMLコードが抜けているか確認
+    //break;
     
     //div.event-search-results.col-main  //<div class="event-search-results col-main">
     var entries = Parser.data(html).from('<li class="event-thumb ng-scope"').to('</li>').iterate();
