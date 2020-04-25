@@ -1,0 +1,40 @@
+function myFunction() {
+  var book = SpreadsheetApp.getActiveSpreadsheet();
+  var sheetData = book.getSheetByName("シート1");
+  //var rowEndData = sheetData.getDataRange().getLastRow();
+  var rowEndData = 1;
+  
+  var word = encodeURI('コロナ'); //sheetData.getRange(N, colID).getValue() 可変時
+  var area = encodeURI('東京'); 
+  
+  var i=0;
+  var k=rowEndData+1; //出力開始行
+  
+  do {
+    i=i+1;
+    var url = 'https://peatix.com/search?q='+word+'&country=JP&l.text='+area+'&p='+i+'&size=10&v=3.4&dr=';
+    var response = UrlFetchApp.fetch(url);
+    var html = response.getContentText('UTF-8');
+    sheetData.getRange(1, 1).setValue(html);  
+    break;
+    
+    //div.event-search-results.col-main  //<div class="event-search-results col-main">
+    var entries = Parser.data(html).from('<li class="event-thumb ng-scope"').to('</li>').iterate();
+    var entrieCode = Parser.data(html).from('<li class="event-thumb ng-scope"').to('</li>').build();
+    sheetData.getRange(k, 4).setValue(entrieCode);  
+    var count=0;
+    for (var entry in entries) {
+      var href = Parser.data(entries[entry]).from('<a href="').to('"').build();
+      var timeStr = Parser.data(entries[entry]).from('<time datetime="').to('"').build();
+      var title = Parser.data(entries[entry]).from('<h3 class="event-thumb_name ng-binding">').to('</h3>').build();
+      count++;
+      sheetData.getRange(k, 2).setValue(href);  
+      sheetData.getRange(k, 1).setValue(title);  
+      sheetData.getRange(k, 3).setValue(timeStr);  
+      k++;
+    }
+    if (count==0) break;
+    
+    if (i>=1) break;
+  } while(true); 
+}
